@@ -1,5 +1,15 @@
 import PySimpleGUI as sg
-import subprocess, psutil, os, os.path, time, webbrowser, sys, threading, tkinter, shutil, ctypes, platform
+import subprocess
+import psutil
+import os
+import os.path
+import time
+import webbrowser
+import sys
+import threading
+import tkinter
+import shutil
+import ctypes
 from ctypes import wintypes
 from requests import get
 try:
@@ -9,6 +19,22 @@ except:
 
 
 def InstallDependencies(): # FUNCTION FOR INSTALLING DEPENDENCIES
+
+    tapfound = False
+    tapcheck = []
+    for (dirpath, dirnames, filenames) in os.walk(r'C:\Windows\System32\DriverStore\FileRepository'):
+        tapcheck.extend(dirnames)
+
+    for drvdir in tapcheck:
+        dirlines = drvdir.split('.')
+        for splitline in dirlines:
+            if splitline == 'oemvista':
+                tapfound = True
+
+    if tapfound == False:
+        os.chdir(ResourcePath(r'FreeLAN'))
+        subprocess.Popen(r'install_driver.bat')
+        os.chdir(ResourcePath(r'..'))
 
     if os.path.isfile(r'C:\Windows\Fonts\AmbexHeavy_0.ttf') == False: #and os.path.isfile(r'C:\Windows\Fonts\ambexheavy.ttf') == False:
         print("Installing missing font: AmbexHeavy")
@@ -30,7 +56,10 @@ def GetPublicIP():                  # FUNCTION FOR GETTING THE PUBLIC IP ADDRESS
     retries = 0
     while True:
         retries += 1
-        ip = get('https://api.ipify.org').text
+        try:
+            ip = get('https://api.ipify.org').text
+        except:
+            ip = "{Not Found}"
         ip_correct = False
         
         for x in range(0,10):
@@ -249,7 +278,7 @@ gdi32.GetFontResourceInfoW.argtypes = (
 
 InstallDependencies()
 
-FREELAN_EXE = ResourcePath(r'FreeLAN\bin\freelan.exe')
+FREELAN_EXE = ResourcePath(r'FreeLAN\freelan.exe')
 
 StopFreeLAN()
 
